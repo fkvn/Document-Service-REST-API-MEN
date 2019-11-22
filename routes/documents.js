@@ -1,65 +1,78 @@
+// import
 const express = require('express');
+const createError = require('http-errors');
+
+// export router
 var router = express.Router();
 
-const DocumentServices = require('../services/DocumentServices');
-const documentServices = new DocumentServices();
+// services
+const documentServices = require('../services/DocumentServices');
+const revisionServices = require('../services/RevisionServices');
 
-const RevisionServices = require('../services/RevisionServices');
-const revisionService = new RevisionServices();
-
+// uploading files module
 const multer = require("multer");
 const uploadService = multer({storage: multer.memoryStorage(), limits: {fileSize: 1000 * 1000 * 200}}); // limit 200MB
 
+// routing
 router.route('/')
-  .get(async (req, res) => {  
-    res.send(await documentServices.getDocuments())
+  .get(async (req, res, next) => {  
+    try {
+      res.send(await documentServices.getDocuments(req))  
+    } catch (error) {
+      next(createError(error.message))
+    }
   })
-  .post(uploadService.single('file'), async (req, res) => {
-    var fullUrl = req.protocol + '://' + req.get('host') + '/files';
-    var newDocId = await documentServices.createDoc(req.body, req.file, fullUrl).catch((err) => {
-      res.status(500).send("null")
-    })
-    res.status(201);
-    res.send(newDocId);
-  })
-
-router.route('/:docId')
-  .get(async (req, res) => {
-    const doc = await documentServices.getDocument(req.params.docId)
-    res.send(doc)
+  .post(uploadService.single('file'), async (req, res, next) => {
+    try {
+      res.status(201).send(await documentServices.createDoc(req))
+    } catch (error) {
+      next(createError(error.message))
+    }
   })
 
-router.route('/:docId/revisions')
-  .get(async (req, res) => { 
-    res.send(await revisionService.getRevisions(req.params.docId, true))
-  })
-  .post(uploadService.single('file'), async (req, res) => {
-    var fullUrl = req.protocol + '://' + req.get('host') + '/files';
-    var newRevisionId = await revisionService.createRevision(req.body.notes, 
-                                              req.params.docId, req.file, fullUrl).catch((err) =>{
-        res.status(500).send("null")                                     
-    })
-    res.status(201)
-    res.send(newRevisionId)
+router.route('/:docId', documentServices.isAuthorized)
+  .get(async (req, res, next) => {
+    try {
+      res.send(await documentServices.getDocument(req));
+    } catch (error) {
+      next(createError(error.message))
+    }
   })
 
-router.route('/:docId/revisions/:revisionId')         
-  .get(async (req, res) => {
-    res.send(await revisionService.getRevision(req.params.docId, req.params.revisionId, true).catch((err) => {
-      res.status(500).send("null")
-    }))
-  })
-  .post(async (req, res) => {
-    if( !req.body.notes)
-      res.sendStatus(500)
+router.route('/:docId/revisions', documentServices.isAuthorized)
+  .get( async (req, res, next) => { 
+    try {
+      res.send(await revisionServices.getRevisions(req.params.docId, true))  
+    } catch (error) {
+      next(createError(error.message))
+    } 
     
-    await revisionService.updateRevision(req.params.docId, req.params.revisionId, req.body.notes).catch((err) => {
-      res.status.send("null")
-    })
+  })
+  .post(uploadService.single('file'), async (req, res, next) => {
+    try {
+      var fullUrl = req.protocol + '://' + req.get('host') + '/files';
+      var newRevisionId = await revisionServices.createRevision(req, req.params.docId)
 
-    res.sendStatus(202)
+      res.status(201).send(newRevisionId)  
+    } catch (error) {
+      next(createError(error.message))
+    }
   })
 
-
+router.route('/:docId/revisions/:revisionId', documentServices.isAuthorized)         
+  .get(async (req, res, next) => {
+    try {
+      res.send(await revisionServices.getRevision(req.params.docId, req.params.revisionId, true)) 
+    } catch (error) {
+      next(createError(error.message))
+    }
+  })
+  .post(async (req, res, next) => {
+    try {
+      res.status(202).send(await revisionServices.updateRevision(req.params.docId, req.params.revisionId, req.body.notes))
+    } catch (error) {
+      next(createError(error.message))
+    }
+  })
 
 module.exports = router;

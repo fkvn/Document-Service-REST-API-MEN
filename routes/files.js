@@ -1,14 +1,25 @@
 const express = require('express');
 var router = express.Router();
+const createError = require('http-errors');
 
-const FileServices = require('../services/FileServices');
-const fileServices = new FileServices();
+const fileServices = require('../services/FileServices');
 
-router.route('/:file_id')
+router.route('/:file_id', fileServices.isAuthorized)
                 .get(async (req, res, next) => {
-                  var file = await fileServices.getFile(req.params.file_id)
-                  res.setHeader('content-type', file.type);
-                  res.setHeader("Content-Disposition",`attachment; filename="${file.name}"`);
-                  res.send(file.fileData.buffer)
+                  try {
+                    var file = await fileServices.getFile(req.params.file_id)
+
+                    if (file.userId != req.user.userId) {
+                      res.sendStatus(401)
+                    }
+                    else {
+                      res.setHeader('content-type', file.type);
+                      res.setHeader("Content-Disposition",`attachment; filename="${file.name}"`);
+                      res.send(file.fileData.buffer)
+                    }
+                  } catch (error) {
+                    next(createError(error.message))
+                  }
                 })
+
 module.exports = router;

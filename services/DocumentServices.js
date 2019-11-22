@@ -1,81 +1,85 @@
 const mongo = require('mongodb')
+const databaseServices = require('./DatabaseServices')
+const revisionServices = require('./RevisionServices')
 
-const FileServices = require('./FileServices')
-const fileServices = new FileServices()
+module.exports = {
+  async getDocuments(req) {
+    const { client, db } = await databaseServices.getClient()
+    const collection = db.collection('hw4Documents')
 
-const RevisionServices = require('./RevisionServices')
-const revisionServices = new RevisionServices()
+    const documents = await collection.find({ 'userId': mongo.ObjectID(req.user.userId) }).toArray();
+    
+    client.close();
 
-class DocumentServices {
-
-  async getDocuments() {
-    const {client, db} = await this.getConnection();
-    const collection = db.collection('documents')
-
-    const  documents = await collection.find({}).toArray();
     var listDocuments = []
     for (let doc of documents) {
-      const revisions  = await revisionServices.getRevisions(doc._id)
-      
-      listDocuments.push( {
+      const revisions = await revisionServices.getRevisions(doc._id)
+
+      listDocuments.push({
         'id': doc._id,
         'name': doc.name,
         'number of revisions': revisions.length,
         'lasted update': revisions[revisions.length - 1].timestamp
-
       })
     }
 
-    client.close();
     return listDocuments
-  }
+  },
 
-  async getDocument(doc_id) {
-    const {client, db} = await this.getConnection();
-    const collection = db.collection('documents');
+  async getDocument(req) {
+    const { client, db } = await databaseServices.getClient()
+    const collection = db.collection('hw4Documents')
 
-    const doc = await collection.findOne({_id: mongo.ObjectID(doc_id)});
-    var revisions = await revisionServices.getRevisions(doc._id, true);
+    const doc = await collection.findOne({ '_id': mongo.ObjectID(req.params.docId) });
+    
+    client.close()
+
+    var revisions = await revisionServices.getRevisions(doc._id, true).catch((err) => {
+      client.close()
+      throw new Error(err)
+    });
 
     doc.revisions = revisions;
-
-    client.close()
     return doc
-  }
+  },
 
-  async createDoc(data,file, url) {
-    
-    const {client, db} = await this.getConnection();
-    const collection =  db.collection('documents')
+  async createDoc(req) {
+    const { client, db } = await databaseServices.getClient()
+    const collection = db.collection('hw4Documents')
 
     let newDoc = {
-      'name': data.name
+      'name': req.body.name,
+      'userId': mongo.ObjectID(req.user.userId)
     }
 
     newDoc = (await collection.insertOne(newDoc)).ops[0]
-  
-    await revisionServices.createRevision(data.notes, newDoc._id, file, url).catch( async (err)  => {
-      
-      await collection.deleteOne({_id: mongo.ObjectID(newDoc._id)})
+
+    await revisionServices.createRevision(req, newDoc._id).catch(async (err) => {
+      await collection.deleteOne({ _id: mongo.ObjectID(newDoc._id)})
+      client.close()
       throw new Error(err);
     })
 
     client.close()
     return newDoc._id
+  },
+
+  async isAuthorized(req, res,next) {
+    const { client, db } = await databaseServices.getClient()
+    const collection = db.collection('hw4Documents')
+
+    const doc = await collection.findOne({ '_id': mongo.ObjectID(req.params.docId) });
+    client.close()
+    
+    if (doc.userId != req.user.userId) {
+      next(createError(401))
+    }
+    next()
   }
-
-  async getConnection() {
-    const MongoClient = require('mongodb').MongoClient;
-    const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?authSource=${process.env.DB_DATABASE}`
-    const client = await MongoClient.connect(url, { useUnifiedTopology: true });
-    const db = client.db(`${process.env.DB_DATABASE}`)
-
-    return {client, db}
-  }
-
 }
 
-module.exports = DocumentServices
+
+
 
 
 

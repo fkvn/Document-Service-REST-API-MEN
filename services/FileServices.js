@@ -1,22 +1,25 @@
 const mongo = require('mongodb')
 const format = require('date-format');
+const databaseServices = require('./DatabaseServices')
 
-class FileServices {
+module.exports = {
 
-  async uploadFile(file, fullUrl) {
-    const {client, db} = await this.getConnection();
-    const collection = db.collection('files')
+  async uploadFile(req, fullUrl) {
+    const { client, db } = await databaseServices.getClient()
+    const collection = db.collection('hw4Files')
 
     var newFile = {
-      'name': file.originalname,
+      'name': req.file.originalname,
       'timestamp': format("MM-dd-yyyy hh:mm:ss", new Date()),
-      'type': file.mimetype,
+      'type': req.file.mimetype,
       'url': fullUrl,
-      'fileData': file.buffer,
-      'fileSize': file.size
+      'fileData': req.file.buffer,
+      'fileSize': req.file.size,
+      'userId': req.user.userId
     }
 
     var insertedFile = (await collection.insertOne(newFile).catch((err) => {
+      client.close();
       throw new Error(err)
     })).ops[0];
 
@@ -24,36 +27,29 @@ class FileServices {
     insertedFile.url = newUrl
     
     await collection.updateOne({'_id': mongo.ObjectID(insertedFile._id)}, {$set: {url: newUrl}}).catch((err) => {
+      client.close();
       throw new Error(err)
     });
 
     client.close();
     return insertedFile._id
-  }
+  },
 
   async getFile(file_id) {
-    const {client, db} = await this.getConnection();
-    const collection = db.collection('files')
+    const { client, db } = await databaseServices.getClient()
+    const collection = db.collection('hw4Files')
 
-    const file =  await collection.findOne({'_id': mongo.ObjectId(file_id)})
-  
+    const file =  await collection.findOne({'_id': mongo.ObjectId(file_id)}).catch((err) => {
+      client.close();
+      throw new Error(err)
+    })
+
     client.close();
     return file
-  }
-
-  async getConnection() {
-    const MongoClient = require('mongodb').MongoClient;
-    const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?authSource=${process.env.DB_DATABASE}`
-    const client = await MongoClient.connect(url, { useUnifiedTopology: true });
-    const db = client.db(`${process.env.DB_DATABASE}`)
-
-    return {client, db}
-  }
-
-
+  },
 }
 
-module.exports = FileServices
+
 
 
 
