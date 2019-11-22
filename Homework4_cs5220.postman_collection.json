@@ -1,0 +1,484 @@
+{
+	"info": {
+		"_postman_id": "8031242f-8cdb-4d94-9b3c-d001f95ac71c",
+		"name": "Homework4_cs5220",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Users (no need to login -> for testing purpose. Password as same as username)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/users",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"kvn1\",\n\t\"password\": \"kvn1\"\n}"
+				},
+				"url": {
+					"raw": "localhost:3000/users",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Documents",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuIiwidXNlcklkIjoiNWRkNzQ4YjBiYWRlOWM0NWYyMDgxODA3IiwiaWF0IjoxNTc0MzkwMDA0fQ.5L5iQkezbu1nfdM3bNpAQ3p4UoLOTJj5lZ_KRCfaqLs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/documents",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Document",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuIiwidXNlcklkIjoiNWRkNzQ4YjBiYWRlOWM0NWYyMDgxODA3IiwiaWF0IjoxNTc0MzkwMDA0fQ.5L5iQkezbu1nfdM3bNpAQ3p4UoLOTJj5lZ_KRCfaqLs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/kevinngo/Downloads/1.jpg"
+						},
+						{
+							"key": "name",
+							"value": "Document kvn 5",
+							"type": "text"
+						},
+						{
+							"key": "notes",
+							"value": "Revision kvn 5.0",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/documents",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a document",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuIiwidXNlcklkIjoiNWRkNzQ4YjBiYWRlOWM0NWYyMDgxODA3IiwiaWF0IjoxNTc0MzkwMDA0fQ.5L5iQkezbu1nfdM3bNpAQ3p4UoLOTJj5lZ_KRCfaqLs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/documents/5dd74cf4d2ba395083300631",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"documents",
+						"5dd74cf4d2ba395083300631"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get revisions from a document",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuIiwidXNlcklkIjoiNWRkNzQ4YjBiYWRlOWM0NWYyMDgxODA3IiwiaWF0IjoxNTc0MzkwMDA0fQ.5L5iQkezbu1nfdM3bNpAQ3p4UoLOTJj5lZ_KRCfaqLs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/documents/5dd74cf4d2ba395083300631/revisions",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"documents",
+						"5dd74cf4d2ba395083300631",
+						"revisions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a new revision to a document",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuIiwidXNlcklkIjoiNWRkNzQ4YjBiYWRlOWM0NWYyMDgxODA3IiwiaWF0IjoxNTc0MzkwMDA0fQ.5L5iQkezbu1nfdM3bNpAQ3p4UoLOTJj5lZ_KRCfaqLs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/kevinngo/Downloads/Photos/1.jpg"
+						},
+						{
+							"key": "notes",
+							"value": "Revision 5.1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/documents/5dd74cf4d2ba395083300631/revisions",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"documents",
+						"5dd74cf4d2ba395083300631",
+						"revisions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a revision from a document",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuIiwidXNlcklkIjoiNWRkNzQ4YjBiYWRlOWM0NWYyMDgxODA3IiwiaWF0IjoxNTc0MzkwMDA0fQ.5L5iQkezbu1nfdM3bNpAQ3p4UoLOTJj5lZ_KRCfaqLs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:3000/documents/5dd74cf4d2ba395083300631/revisions/5dd74f23c0df4555cfcbe2b4",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"documents",
+						"5dd74cf4d2ba395083300631",
+						"revisions",
+						"5dd74f23c0df4555cfcbe2b4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit a revision",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuIiwidXNlcklkIjoiNWRkNzQ4YjBiYWRlOWM0NWYyMDgxODA3IiwiaWF0IjoxNTc0MzkwMDA0fQ.5L5iQkezbu1nfdM3bNpAQ3p4UoLOTJj5lZ_KRCfaqLs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"notes\": \"updated 5.2\"\n}"
+				},
+				"url": {
+					"raw": "localhost:3000/documents/5dd74cf4d2ba395083300631/revisions/5dd74f23c0df4555cfcbe2b4",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"documents",
+						"5dd74cf4d2ba395083300631",
+						"revisions",
+						"5dd74f23c0df4555cfcbe2b4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Download a file",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuIiwidXNlcklkIjoiNWRkNzQ4YjBiYWRlOWM0NWYyMDgxODA3IiwiaWF0IjoxNTc0MzkwMDA0fQ.5L5iQkezbu1nfdM3bNpAQ3p4UoLOTJj5lZ_KRCfaqLs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/files/5dd74f23c0df4555cfcbe2b3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"files",
+						"5dd74f23c0df4555cfcbe2b3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"kvn1\",\n\t\"password\": \"kvn1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/login",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wrong username and/or password.",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"kvn1\",\n\t\"password\": \"kvn\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/login",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User not being authenticated",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuMSIsInVzZXJJZCI6IjVkZDc0OGQ4YmFkZTljNDVmMjA4MTgwOCIsImlhdCI6MTU3NDM5MTc5M30.LGN3FNm6XsM0ZpTtSJoj4fbUgm7c4Z3xb16rkSnsssssDOQ8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/documents",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "when an authenticated user tries to download a file from a document not created by him/herself (kvn1 tries to download file of kvn)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoia3ZuMSIsInVzZXJJZCI6IjVkZDc0OGQ4YmFkZTljNDVmMjA4MTgwOCIsImlhdCI6MTU3NDM5MTc5M30.LGN3FNm6XsM0ZpTtSJoj4fbUgm7c4Z3xb16rkSnDOQ8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/files/5dd74f23c0df4555cfcbe2b3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"files",
+						"5dd74f23c0df4555cfcbe2b3"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
