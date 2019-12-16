@@ -1,26 +1,22 @@
 const mongo = require('mongodb')
 const bcrypt = require('bcryptjs');
 
-class UserServices {
+module.exports =  {
 
   async getUsers(db) {
-    const userCollection = db.collection('hw4Users')
+    const userCollection = db.collection('Users')
     
     const users =  await  userCollection.find({}).project({'password': false}).toArray().catch((err) => {
       throw new Error(err)
     })
     return users
-  }
+  },
 
   async getUser(db, username, password) {
 
-    const userCollection = db.collection('hw4Users')
-
-    console.log(username + " - " + password + " - ");
-    
-    
+    const userCollection = db.collection('Users')
+  
     const user =  await userCollection.findOne({'username': username})
-
 
     if (bcrypt.compareSync(password, user.password))
     {
@@ -29,10 +25,10 @@ class UserServices {
     }  
     else
       return null;
-  }
+  },
 
   async createUser(db, username, password) {
-    const userCollection = db.collection('hw4Users')
+    const userCollection = db.collection('Users')
 
     var existUser = await userCollection.findOne({'username': username})
 
@@ -52,7 +48,7 @@ class UserServices {
   }
 }
 
-module.exports = UserServices
+
 
 
 

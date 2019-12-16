@@ -1,12 +1,11 @@
 const mongo = require('mongodb')
 const format = require('date-format');
-const databaseServices = require('./DatabaseServices')
 
 module.exports = {
 
   async uploadFile(req, fullUrl) {
     const db = req.app.locals.db
-    const fileCollection = db.collection('hw4Files')
+    const fileCollection = db.collection('Files')
 
     var newFile = {
       'name': req.file.originalname,
@@ -34,7 +33,7 @@ module.exports = {
 
   async getFile(db, file_id) {
     
-    const fileCollection = db.collection('hw4Files')
+    const fileCollection = db.collection('Files')
 
     const file =  await fileCollection.findOne({'_id': mongo.ObjectId(file_id)}).catch((err) => {
       throw new Error(err)

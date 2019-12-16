@@ -7,8 +7,7 @@ var jwt = require('jsonwebtoken')
 const jwtSecret = process.env.JWT_SECRET || 'no secret??';
 
 // users' services
-const UserServices = require('../services/UserServices');
-const userServices = new UserServices();
+const userServices = require('../services/UserServices');
 
 // routing
 router.route('/')

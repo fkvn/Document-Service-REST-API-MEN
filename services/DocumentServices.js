@@ -1,11 +1,10 @@
 const mongo = require('mongodb')
-const databaseServices = require('./DatabaseServices')
 const revisionServices = require('./RevisionServices')
 
 module.exports = {
   async getDocuments(req) {
     const db = req.app.locals.db
-    const docCollection = db.collection('hw4Documents')
+    const docCollection = db.collection('Documents')
     
     
     const documents = await docCollection.find({ 'userId': mongo.ObjectID(req.user.userId) }).toArray();
@@ -28,8 +27,7 @@ module.exports = {
   async getDocument(req) {
 
     const db = req.app.locals.db
-    const docCollection = db.collection('hw4Documents')
-    console.log(docCollection);
+    const docCollection = db.collection('Documents')
 
     const doc = await docCollection.findOne({ '_id': mongo.ObjectID(req.params.docId) });
 
@@ -44,7 +42,7 @@ module.exports = {
   async createDoc(req) {
     const db = req.app.locals.db;
 
-    const docCollection = db.collection('hw4Documents')
+    const docCollection = db.collection('Documents')
 
     let newDoc = {
       'name': req.body.name,
@@ -63,7 +61,7 @@ module.exports = {
 
   async isAuthorized(req, res,next) {
     const db = req.app.locals.db
-    const docCollection = db.collection('hw4Documents')
+    const docCollection = db.collection('Documents')
 
     const doc = await docCollection.findOne({ '_id': mongo.ObjectID(req.params.docId) });
     

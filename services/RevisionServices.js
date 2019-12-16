@@ -1,13 +1,12 @@
 const format = require('date-format');
 const mongo = require('mongodb')
-const databaseServices = require('./DatabaseServices')
 const fileServices = require('./FileServices')
 
 module.exports = {
 
   async getRevisions(db, docId, printVersion) {
     
-    const revCollection = db.collection('hw4Revisions')
+    const revCollection = db.collection('Revisions')
   
     var revisions = await revCollection.find({ 'documentId': mongo.ObjectID(docId) }).sort({ timestamp: 1 }).toArray()
 
@@ -25,7 +24,7 @@ module.exports = {
 
   async getRevision(db, docId, revisionId, printVersion) {
 
-    const revCollection = db.collection('hw4Revisions')
+    const revCollection = db.collection('Revisions')
 
     var revision = await revCollection.findOne({ 'documentId': mongo.ObjectID(docId), '_id': mongo.ObjectID(revisionId) })
 
@@ -41,7 +40,7 @@ module.exports = {
 
   async createRevision(req, documentId) {
     const db = req.app.locals.db
-    const revCollection = db.collection('hw4Revisions')
+    const revCollection = db.collection('Revisions')
 
     var fullUrl = req.protocol + '://' + req.get('host') + '/files';
     const newFileId = await fileServices.uploadFile(req, fullUrl).catch((err) => {
@@ -65,7 +64,7 @@ module.exports = {
 
   async updateRevision(db, docId, revisionId, notes) {
 
-    const revCollection = db.collection('hw4Revisions')
+    const revCollection = db.collection('Revisions')
 
     if (notes)
     {
