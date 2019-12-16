@@ -17,3 +17,14 @@ Each revision has a file uploaded by a user, some notes on the revision (optiona
 * Only the creator of a document can perform any operation on a document (including the revisions and files of the document).
 Environment-specific information such as database information and JWT secrete should be placed in a .env file and set using the dotenv package.
 * For login endpoint that authenticates a user, if authentication is successful, it sends back a JWT token which can be used in subsequent requests.
+
+# Play around
+
+1. Clone or download a project to your local machine.
+2. Change ".env.sample" file name to ".env" 
+3. Fill out information inside ".env" file
+4. run comman **npm start** to start the server.
+5. import **Homework4_cs5220.postman_collection.json** file to Postman to play around with REST API.
+
+# Contact.
+Email: phucaone@gmail.com (Kevin)
