@@ -33,11 +33,8 @@ module.exports = {
   },
 
   async getFile(db, file_id) {
-    console.log("file");
     
     const fileCollection = db.collection('hw4Files')
-    console.log(fileCollection);
-    
 
     const file =  await fileCollection.findOne({'_id': mongo.ObjectId(file_id)}).catch((err) => {
       throw new Error(err)
