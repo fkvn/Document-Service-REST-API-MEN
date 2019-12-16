@@ -26,5 +26,5 @@ Environment-specific information such as database information and JWT secrete sh
 4. run comman **npm start** to start the server.
 5. import **Homework4_cs5220.postman_collection.json** file to Postman to play around with REST API.
 
-# Contact.
+# Contact
 Email: phucaone@gmail.com (Kevin)
