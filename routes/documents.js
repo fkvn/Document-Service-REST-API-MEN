@@ -42,7 +42,7 @@ router.route('/:docId', documentServices.isAuthorized)
 router.route('/:docId/revisions', documentServices.isAuthorized)
   .get( async (req, res, next) => { 
     try {
-      res.send(await revisionServices.getRevisions(req.params.docId, true))  
+      res.send(await revisionServices.getRevisions(req.app.locals.db, req.params.docId, true))  
     } catch (error) {
       next(createError(error.message))
     } 
@@ -62,14 +62,14 @@ router.route('/:docId/revisions', documentServices.isAuthorized)
 router.route('/:docId/revisions/:revisionId', documentServices.isAuthorized)         
   .get(async (req, res, next) => {
     try {
-      res.send(await revisionServices.getRevision(req.params.docId, req.params.revisionId, true)) 
+      res.send(await revisionServices.getRevision(req.app.locals.db, req.params.docId, req.params.revisionId, true)) 
     } catch (error) {
       next(createError(error.message))
     }
   })
   .post(async (req, res, next) => {
     try {
-      res.status(202).send(await revisionServices.updateRevision(req.params.docId, req.params.revisionId, req.body.notes))
+      res.status(202).send(await revisionServices.updateRevision(req.app.locals.db, req.params.docId, req.params.revisionId, req.body.notes))
     } catch (error) {
       next(createError(error.message))
     }

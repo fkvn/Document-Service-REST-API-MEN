@@ -14,7 +14,7 @@ const userServices = new UserServices();
 router.route('/')
   .post(async (req, res, next) => {
     try {
-      const user = await userServices.getUser(req.body.username, req.body.password)
+      const user = await userServices.getUser(req.app.locals.db, req.body.username, req.body.password)
       if (user)
       {
         res.json({

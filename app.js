@@ -1,5 +1,6 @@
 // import 
 require('dotenv').config()
+
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -14,12 +15,24 @@ const documentsRouter = require('./routes/documents')
 const filesRouter = require('./routes/files')
 const loginRouter = require('./routes/login')
 
-
 const passport = require('./middleware/passport')
 const isLoggedIn = passport.authenticate('jwt', {session: false})
 
-
 const app = express();
+
+/**
+ * Set up Database connection
+ */
+
+const MongoClient = require('mongodb').MongoClient;
+const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?authSource=${process.env.DB_DATABASE}`
+
+MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(client => {
+    const db = client.db(`${process.env.DB_DATABASE}`);
+    
+    app.locals.db = db
+  }).catch(error => console.error(error));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,6 +57,7 @@ app.use('/login', loginRouter)
 app.use('/users', usersRouter);
 app.use('/documents', isLoggedIn, documentsRouter);
 app.use('/files', isLoggedIn, filesRouter);
+
 
 
 // catch 404 and forward to error handler

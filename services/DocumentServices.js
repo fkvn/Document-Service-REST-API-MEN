@@ -4,16 +4,15 @@ const revisionServices = require('./RevisionServices')
 
 module.exports = {
   async getDocuments(req) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Documents')
-
-    const documents = await collection.find({ 'userId': mongo.ObjectID(req.user.userId) }).toArray();
+    const db = req.app.locals.db
+    const docCollection = db.collection('hw4Documents')
     
-    client.close();
+    
+    const documents = await docCollection.find({ 'userId': mongo.ObjectID(req.user.userId) }).toArray();
 
     var listDocuments = []
     for (let doc of documents) {
-      const revisions = await revisionServices.getRevisions(doc._id)
+      const revisions = await revisionServices.getRevisions(db, doc._id)
 
       listDocuments.push({
         'id': doc._id,
@@ -27,15 +26,14 @@ module.exports = {
   },
 
   async getDocument(req) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Documents')
 
-    const doc = await collection.findOne({ '_id': mongo.ObjectID(req.params.docId) });
-    
-    client.close()
+    const db = req.app.locals.db
+    const docCollection = db.collection('hw4Documents')
+    console.log(docCollection);
 
-    var revisions = await revisionServices.getRevisions(doc._id, true).catch((err) => {
-      client.close()
+    const doc = await docCollection.findOne({ '_id': mongo.ObjectID(req.params.docId) });
+
+    var revisions = await revisionServices.getRevisions(db, doc._id, true).catch((err) => {
       throw new Error(err)
     });
 
@@ -44,32 +42,30 @@ module.exports = {
   },
 
   async createDoc(req) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Documents')
+    const db = req.app.locals.db;
+
+    const docCollection = db.collection('hw4Documents')
 
     let newDoc = {
       'name': req.body.name,
       'userId': mongo.ObjectID(req.user.userId)
     }
 
-    newDoc = (await collection.insertOne(newDoc)).ops[0]
+    newDoc = (await docCollection.insertOne(newDoc)).ops[0]
 
     await revisionServices.createRevision(req, newDoc._id).catch(async (err) => {
-      await collection.deleteOne({ _id: mongo.ObjectID(newDoc._id)})
-      client.close()
+      await docCollection.deleteOne({ _id: mongo.ObjectID(newDoc._id)})
       throw new Error(err);
     })
 
-    client.close()
     return newDoc._id
   },
 
   async isAuthorized(req, res,next) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Documents')
+    const db = req.app.locals.db
+    const docCollection = db.collection('hw4Documents')
 
-    const doc = await collection.findOne({ '_id': mongo.ObjectID(req.params.docId) });
-    client.close()
+    const doc = await docCollection.findOne({ '_id': mongo.ObjectID(req.params.docId) });
     
     if (doc.userId != req.user.userId) {
       next(createError(401))

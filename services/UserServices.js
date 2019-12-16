@@ -3,30 +3,24 @@ const bcrypt = require('bcryptjs');
 
 class UserServices {
 
-  async getUsers() {
-    const {client, db} = await this.getConnection();
-    const collection = db.collection('hw4Users')
-
-    const users =  await collection.find({}).project({'password': false}).toArray().catch((err) => {
+  async getUsers(db) {
+    const userCollection = db.collection('hw4Users')
+    
+    const users =  await  userCollection.find({}).project({'password': false}).toArray().catch((err) => {
       throw new Error(err)
     })
-  
-    client.close();
     return users
   }
 
-  async getUser(username, password) {
-    console.log('here user');
-    
-    const {client, db} = await this.getConnection();
-    const collection = db.collection('hw4Users')
+  async getUser(db, username, password) {
+
+    const userCollection = db.collection('hw4Users')
 
     console.log(username + " - " + password + " - ");
     
     
-    const user =  await collection.findOne({'username': username})
+    const user =  await userCollection.findOne({'username': username})
 
-    client.close()
 
     if (bcrypt.compareSync(password, user.password))
     {
@@ -37,11 +31,10 @@ class UserServices {
       return null;
   }
 
-  async createUser(username, password) {
-    const {client, db} = await this.getConnection();
-    const collection = db.collection('hw4Users')
+  async createUser(db, username, password) {
+    const userCollection = db.collection('hw4Users')
 
-    var existUser = await collection.findOne({'username': username})
+    var existUser = await userCollection.findOne({'username': username})
 
     if (existUser)
       throw new Error("Username has been taken")
@@ -54,23 +47,9 @@ class UserServices {
         'password': hash,
       }
 
-      await collection.insertOne(newUser).catch((err) => {throw new Error(err)})
-
-      client.close();
+      await userCollection.insertOne(newUser).catch((err) => {throw new Error(err)})
     }
   }
-
-
-
-  async getConnection() {
-    const MongoClient = require('mongodb').MongoClient;
-    const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?authSource=${process.env.DB_DATABASE}`
-    const client = await MongoClient.connect(url, { useUnifiedTopology: true });
-    const db = client.db(`${process.env.DB_DATABASE}`)
-
-    return {client, db}
-  }
-
 }
 
 module.exports = UserServices

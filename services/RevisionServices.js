@@ -5,16 +5,15 @@ const fileServices = require('./FileServices')
 
 module.exports = {
 
-  async getRevisions(docId, printVersion) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Revisions')
-
-    var revisions = await collection.find({ 'documentId': mongo.ObjectID(docId) }).sort({ timestamp: 1 }).toArray()
-    client.close()
+  async getRevisions(db, docId, printVersion) {
+    
+    const revCollection = db.collection('hw4Revisions')
+  
+    var revisions = await revCollection.find({ 'documentId': mongo.ObjectID(docId) }).sort({ timestamp: 1 }).toArray()
 
     if (printVersion) {
       for (let revision of revisions) {
-        const fileUrl = (await fileServices.getFile(revision.fileId)).url;
+        const fileUrl = (await fileServices.getFile(db, revision.fileId)).url;
         revision.file = fileUrl;
         delete revision.documentId;
         delete revision.fileId;
@@ -24,15 +23,14 @@ module.exports = {
     return revisions
   },
 
-  async getRevision(docId, revisionId, printVersion) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Revisions')
+  async getRevision(db, docId, revisionId, printVersion) {
 
-    var revision = await collection.findOne({ 'documentId': mongo.ObjectID(docId), '_id': mongo.ObjectID(revisionId) })
-    client.close()
+    const revCollection = db.collection('hw4Revisions')
+
+    var revision = await revCollection.findOne({ 'documentId': mongo.ObjectID(docId), '_id': mongo.ObjectID(revisionId) })
 
     if (printVersion) {
-      const fileUrl = (await fileServices.getFile(revision.fileId)).url;
+      const fileUrl = (await fileServices.getFile(db, revision.fileId)).url;
       revision.file = fileUrl;
       delete revision.documentId;
       delete revision.fileId;
@@ -42,12 +40,11 @@ module.exports = {
   },  
 
   async createRevision(req, documentId) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Revisions')
+    const db = req.app.locals.db
+    const revCollection = db.collection('hw4Revisions')
 
     var fullUrl = req.protocol + '://' + req.get('host') + '/files';
     const newFileId = await fileServices.uploadFile(req, fullUrl).catch((err) => {
-      client.close()
       throw new Error(err);
     })
     
@@ -58,30 +55,26 @@ module.exports = {
       'fileId': newFileId
     }
 
-    newRevision = (await collection.insertOne(newRevision).catch(async (err) => {
+    newRevision = (await revCollection.insertOne(newRevision).catch(async (err) => {
       await db.collection('files').deleteOne({ _id: mongo.ObjectID(newFileId._id) })
-      client.close()
       throw new Error(err);
     })).ops[0]
 
-    client.close()
     return newRevision._id
   },
 
-  async updateRevision(docId, revisionId, notes) {
-    const {client, db} = await databaseServices.getClient()
-    const collection = db.collection('hw4Revisions')
+  async updateRevision(db, docId, revisionId, notes) {
+
+    const revCollection = db.collection('hw4Revisions')
 
     if (notes)
     {
-      await collection.updateOne({ 'documentId': mongo.ObjectID(docId), '_id': mongo.ObjectID(revisionId) },
+      await revCollection.updateOne({ 'documentId': mongo.ObjectID(docId), '_id': mongo.ObjectID(revisionId) },
       { $set: { 'notes': notes} }).catch((err) => {
-        client.close();
         throw new Error(err)
       });
     }
 
-    client.close();
   },
 }
 

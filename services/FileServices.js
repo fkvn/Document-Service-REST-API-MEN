@@ -5,8 +5,8 @@ const databaseServices = require('./DatabaseServices')
 module.exports = {
 
   async uploadFile(req, fullUrl) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Files')
+    const db = req.app.locals.db
+    const fileCollection = db.collection('hw4Files')
 
     var newFile = {
       'name': req.file.originalname,
@@ -18,33 +18,31 @@ module.exports = {
       'userId': req.user.userId
     }
 
-    var insertedFile = (await collection.insertOne(newFile).catch((err) => {
-      client.close();
+    var insertedFile = (await fileCollection.insertOne(newFile).catch((err) => {
       throw new Error(err)
     })).ops[0];
 
     const newUrl = insertedFile.url + "/" + insertedFile._id;
     insertedFile.url = newUrl
     
-    await collection.updateOne({'_id': mongo.ObjectID(insertedFile._id)}, {$set: {url: newUrl}}).catch((err) => {
-      client.close();
+    await fileCollection.updateOne({'_id': mongo.ObjectID(insertedFile._id)}, {$set: {url: newUrl}}).catch((err) => {
       throw new Error(err)
     });
 
-    client.close();
     return insertedFile._id
   },
 
-  async getFile(file_id) {
-    const { client, db } = await databaseServices.getClient()
-    const collection = db.collection('hw4Files')
+  async getFile(db, file_id) {
+    console.log("file");
+    
+    const fileCollection = db.collection('hw4Files')
+    console.log(fileCollection);
+    
 
-    const file =  await collection.findOne({'_id': mongo.ObjectId(file_id)}).catch((err) => {
-      client.close();
+    const file =  await fileCollection.findOne({'_id': mongo.ObjectId(file_id)}).catch((err) => {
       throw new Error(err)
     })
 
-    client.close();
     return file
   },
 }
