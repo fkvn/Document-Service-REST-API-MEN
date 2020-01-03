@@ -25,12 +25,12 @@ const app = express();
  */
 
 const MongoClient = require('mongodb').MongoClient;
+process.env.DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD);
 const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}?authSource=${process.env.DB_DATABASE}`
 
-MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true})
   .then(client => {
     const db = client.db(`${process.env.DB_DATABASE}`);
-    
     app.locals.db = db
   }).catch(error => console.error(error));
 
